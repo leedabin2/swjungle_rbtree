@@ -184,6 +184,7 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
   return NULL;
 }
 
+
 node_t *rbtree_min(const rbtree *t) {
   // TODO: implement find
   // 가장 왼쪽으로 내려가기
@@ -194,6 +195,7 @@ node_t *rbtree_min(const rbtree *t) {
   }
   return x;
 }
+
 
 node_t *rbtree_max(const rbtree *t) {
   // TODO: implement find
@@ -221,6 +223,7 @@ static void rb_transplant(rbtree *t,node_t *u, node_t *v) {
 
 }
 
+
 node_t *find_successor(rbtree *t, node_t *z) {
   // 왼쪽 자식이 nil이면 종료(비어 있지 않은 경우 가장 작은 값을 가진 노드를 찾음)
   while (z->left != t->nil)
@@ -230,6 +233,7 @@ node_t *find_successor(rbtree *t, node_t *z) {
   
   return z;
 }
+
 
 void rb_erase_fixup(rbtree *t,node_t *x) {
   node_t *w;
@@ -328,7 +332,7 @@ int rbtree_erase(rbtree *t, node_t *z) {
   node_t *y = z; // 대체노드 탐색 후 대체할 노드를 가리키는 주소
 
   color_t y_original_color = y->color; // 나중에 삭제하는 노드의 색깔
-  node_t *x;  // y의 자식
+  node_t *x = NULL;  // y의 자식
 
   // 삭제하려는 노드의 자녀가 없거나 하나면 삭제되는 색  == 삭제되는 노드의 색
   
