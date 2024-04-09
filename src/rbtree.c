@@ -184,20 +184,17 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
   return NULL;
 }
 
-// 왼쪽 서브트리의 가장 오른쪽 노드 찾기
 node_t *rbtree_min(const rbtree *t) {
   // TODO: implement find
-  // 가장 오른쪽으로 내려가기
+  // 가장 왼쪽으로 내려가기
   node_t *x = t->root;
   while (x->left != t->nil)
   {
     x = x->left; 
   }
-
   return x;
 }
 
-// 오른쪽 서브트리의 가장 왼쪽 노드 찾기
 node_t *rbtree_max(const rbtree *t) {
   // TODO: implement find
   node_t *x = t->root;
@@ -278,7 +275,7 @@ void rb_erase_fixup(rbtree *t,node_t *x) {
       }
     
     }
-
+ 
     // 이중 흑색 노드의 부모가 오른쪽 자식인 경우
     else
     {
@@ -312,7 +309,7 @@ void rb_erase_fixup(rbtree *t,node_t *x) {
         // 부모와 형제 노드의 오른쪽 자식을 검정으로
         x->parent->color = RBTREE_BLACK;
         w->left->color = RBTREE_BLACK;
-        // 부모 노드 기준으로 좌회전 
+
         right_rotate(t,x->parent);
         x = t->root; 
 
