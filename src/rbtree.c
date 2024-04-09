@@ -212,14 +212,15 @@ node_t *rbtree_max(const rbtree *t) {
 // 삭제하려는 노드에 대입할 동작을 수행하는 함수
 static void rb_transplant(rbtree *t,node_t *u, node_t *v) {
 
+  // 삭제하려는 노드의 자녀의 부모가 t->nil (삭제하려는 노드가 루트노드인 경우?)
   if (u->parent == t->nil) {
-    t->root = v;
-  } else if (u == u->parent->left) {
-    u->parent->left = v;
+    t->root = v; // 자식이 루트 노드가 됨
+  } else if (u == u->parent->left) { // 삭제하려는 노드가 부모의 왼쪽 자식이
+    u->parent->left = v; // 삭제하려는 부모의 왼쪽에 대체를 가져
   } else {
     u->parent->right = v;
   }
-  v->parent = u->parent;
+  v->parent = u->parent; // 삭제하려는 노드의 부모가 대체제의 부모가 됨
 
 }
 
@@ -332,7 +333,9 @@ int rbtree_erase(rbtree *t, node_t *z) {
   color_t y_original_color = y->color; // 나중에 삭제하는 노드의 색깔
   node_t *x;  // y의 자식
 
-  // 자녀가 유효한 경우에만 (nil이 아닌 경우에만) 
+  // 삭제하려는 노드의 자녀가 없거나 하나면 삭제되는 색  == 삭제되는 노드의 색
+  
+  // 자녀가 유효한 경우에만 (nil이 아닌 경우에만)  
   if (z->left == t->nil) { // 노드의 자식이 오른쪽만 있으면
     x = z->right; // 노드의 자식을 z자리에 심는다. 
     rb_transplant(t,z,z->right); // 오른쪽 자식을 z로 옮긴다.
