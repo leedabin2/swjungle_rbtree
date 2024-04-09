@@ -22,10 +22,10 @@ void postorder_rbtree(rbtree *t, node_t *x) {
     postorder_rbtree(t,x->left);
     postorder_rbtree(t,x->right);
     free(x);
-  }
-
-  
+  }  
 }
+
+
 void delete_rbtree(rbtree *t) {
   // TODO: reclaim the tree nodes's memory
   node_t *x = t->root;
@@ -34,14 +34,7 @@ void delete_rbtree(rbtree *t) {
   free(t);
 }
 
-// [중위 순회] : 확인용
-static void inorder_tree_work(rbtree *t, node_t *x) {
-  if (x != t->nil) {
-    inorder_tree_work(t, x->left);
-    printf("색깔 : %d, 키 값 : %d\n", x->color, x->key);
-    inorder_tree_work(t, x->right);
-  }
-}
+
 static void right_rotate(rbtree* t, node_t* node){
   node_t* x = node->left;
   node->left = x->right;
@@ -59,6 +52,7 @@ static void right_rotate(rbtree* t, node_t* node){
   x->right = node;
   node->parent = x;
 }
+
 
 static void left_rotate(rbtree* t, node_t* node){
   node_t* y = node->right;
@@ -78,6 +72,7 @@ static void left_rotate(rbtree* t, node_t* node){
   y->left = node;
   node->parent = y;
 }
+
 
 static void rbtree_insert_fixup(rbtree* T, node_t* node){
   // 새노드의 부모가 레드일 때
@@ -161,7 +156,6 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
   }
   
   rbtree_insert_fixup(t,newnode);
-  inorder_tree_work(t,t->root);
 
   return t->root;
 }
@@ -190,7 +184,7 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
   return NULL;
 }
 
-// 왼쪽 서브트리의 가장 오른쪽 노드 찾
+// 왼쪽 서브트리의 가장 오른쪽 노드 찾기
 node_t *rbtree_min(const rbtree *t) {
   // TODO: implement find
   // 가장 오른쪽으로 내려가기
@@ -258,18 +252,18 @@ void rb_erase_fixup(rbtree *t,node_t *x) {
       }
 
       // case 2 : 이중 흑색 노드 형제가 검은색이고, 형제 양쪽 자식이 모두 black
-      if (w->left->color == RBTREE_BLACK && w->right->color == RBTREE_BLACK) {
+      if (w->left->color == RBTREE_BLACK && w->right->color == RBTREE_BLACK) { 
         w->color = RBTREE_RED;
         x = x->parent; 
       } else {
         if (w->right->color == RBTREE_BLACK) {
        // case 3 : 이중 흑색 노드 형제가 검은색이고, 형제의 왼쪽 자식이 빨강, 오른쪽 자식이 검정인 경우
-        w->color = RBTREE_RED;
         w->left->color = RBTREE_BLACK;
+        w->color = RBTREE_RED;
 
         // 형제 노드를 기준으로 우회전
         right_rotate(t,w);
-        w = w->parent->right;
+        w = x->parent->right;
         } 
         // case 4 : 이중 흑색 노드의 형제가 검정이고 형제 오른쪽 자식이 빨강인 경
         // 부모 노드 색을 형제에게
@@ -304,7 +298,7 @@ void rb_erase_fixup(rbtree *t,node_t *x) {
         x = x->parent; 
       } else
       { // case 3 : 이중 흑색 노드 형제가 검은색이고, 형제의 왼쪽 자식이 빨강, 오른쪽 자식이 검정인 경우
-        if ( w->right->color == RBTREE_RED && w->left->color == RBTREE_BLACK) {
+        if ( w->left->color == RBTREE_BLACK) {
           w->color = RBTREE_RED;
           w->right->color = RBTREE_BLACK;
 
@@ -373,33 +367,28 @@ int rbtree_erase(rbtree *t, node_t *z) {
   return 0;
 }
 
-void inorder_rbtree_to_array(const rbtree *t, node_t *x, key_t *arr, int *idx, const size_t n) {
-  if (x == t->nil) {
-    return;
+// 중위 순회
+void inorder_rbtree(const rbtree *t, node_t *x, key_t *arr,int *idx,const size_t n) {
+
+  if (x != t->nil && *idx < n) {
+      inorder_rbtree(t, x->left, arr, idx, n);
+      arr[(*idx)++] = x->key;
+      inorder_rbtree(t, x->right, arr, idx, n);
   }
-  
-  inorder_rbtree_to_array(t, x->left, arr, idx, n);
-  if (*idx < n) {
-    arr[(*idx)++] = x->key;                           // *idx는 0, 1, 2, 3...이다. 그리고 후위 연산자 ++이므로 0부터 인덱스가 시작된다.
-  } else {
-    return;
-  }
-  inorder_rbtree_to_array(t, x->right, arr, idx, n);
+
 }
 
-// [오름차순으로 배열에 값 저장]
-// rbtree를 가르키는 t 값(주소값)은 변하면 안되므로 const
-// arr는 inorder 함수를 거칠 때 마다 변할 수 있으므로 const 없이
-// n은 arr의 사이즈로 변하면 안되므로 const를 붙여준다. size_t는 unsigned int로, 어차피 배열의 사이즈 n은 양수일테니 size_t로 선언
+// 오름차순
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
+
   node_t *x = t->root;
   if (x == t->nil) {
     return 0;
   }
-  int cnt = 0;
-  int *idx = &cnt;
-  inorder_rbtree_to_array(t, x, arr, idx, n);
-  
+
+  int idx = 0;
+  inorder_rbtree(t,x,arr,&idx,n);
+
   // TODO: implement to_array
   return 0;
 }
